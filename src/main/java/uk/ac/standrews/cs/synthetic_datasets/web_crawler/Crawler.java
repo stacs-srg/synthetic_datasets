@@ -21,6 +21,11 @@ public class Crawler {
     private static final String CRAWLER_DATASET = "datasets/crawler/";
     private static final int DOWNLOAD_BUFFER_SIZE = 4096;
 
+    private static final int NUMBER_OF_FILES_LIMIT = 2048;
+    private static final int DATASET_SIZE_LIMIT_MB = 10 * 1024 * 1024;
+
+    private static int numberOfFiles;
+    private static int datasetSize;
     private static HashMap<String, Long> visitedSites;
 
     public static void main(String[] args) {
@@ -28,7 +33,7 @@ public class Crawler {
         visitedSites = new LinkedHashMap<>();
         Queue<String> endPoints = new LinkedList<>(readEndPoints(CRAWLER_ENDPOINTS_FILE));
 
-        while(!endPoints.isEmpty()) {
+        while(!endPoints.isEmpty() && numberOfFiles < NUMBER_OF_FILES_LIMIT && datasetSize < DATASET_SIZE_LIMIT_MB) {
             try {
                 crawl(endPoints);
             } catch (IOException| URISyntaxException | CrawlerException e) {
@@ -107,7 +112,9 @@ public class Crawler {
 
         for (Element src : srcs) {
             String srcURI = src.attr("abs:src");
-            addContent(srcURI);
+            if (!visitedSites.containsKey(srcURI)) { // TODO - expire key after X time
+                endPoints.add(srcURI);
+            }
         }
 
         for(Element link:links) {
@@ -126,10 +133,16 @@ public class Crawler {
         String path = targetFilePath(srcURI);
         File targetFile = new File(CRAWLER_DATASET + path);
 
-        makePath(targetFile.getPath());
-        downloadUsingStream(srcURI, targetFile.getPath());
+        if (!targetFile.exists()) {
 
-        System.out.println("data saved to " + targetFile.getAbsolutePath());
+            makePath(targetFile.getPath());
+            downloadUsingStream(srcURI, targetFile.getPath());
+
+            numberOfFiles++;
+            datasetSize += targetFile.length();
+
+            System.out.println("data saved to " + targetFile.getAbsolutePath());
+        }
     }
 
     private static void downloadUsingStream(String urlStr, String file) throws IOException{
