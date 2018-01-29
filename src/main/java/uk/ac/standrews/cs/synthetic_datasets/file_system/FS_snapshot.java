@@ -1,5 +1,7 @@
 package uk.ac.standrews.cs.synthetic_datasets.file_system;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -20,8 +22,15 @@ public class FS_snapshot {
 
         DatasetFileVisitor<Path> fv = new DatasetFileVisitor<>();
 
-        File pathToSnapshot = new File("datasets/");
+        File pathToSnapshot = new File("/Users/sic2/git/");
         Files.walkFileTree(pathToSnapshot.toPath(), fv);
+
+        System.out.println("\n\n=================================");
+        System.out.println("Number of files: " + fv.numberOfFiles);
+        System.out.println("Size dataset: " + fv.totalSize + " (" + (fv.totalSize / (1024*1024*1.0)) + "MB)");
+        System.out.println("Number of directories: " + fv.numberOfDirectories);
+
+        // Info about data types
     }
 
     private static class DatasetFileVisitor<T> extends SimpleFileVisitor<Path> {
@@ -54,6 +63,9 @@ public class FS_snapshot {
             numberOfFiles++;
             totalSize += file.toFile().length();
             filesSize.add(file.toFile().length());
+
+            String extension = FilenameUtils.getExtension(file.getFileName().toString());
+            fileExtensions.add(extension);
 
             return FileVisitResult.CONTINUE;
         }
