@@ -86,7 +86,7 @@ public class TextDatasetGenerator {
             }
         }
 
-        System.out.println("[" + index + " ] -- Created file: " + filepath + " || Size (bytes): " + currentSize + " || No. words: " + numberOfWords) ;
+        System.out.println("[ " + index + " ] -- Created file: " + filepath + " || Size (bytes): " + currentSize + " || No. words: " + numberOfWords) ;
     }
 
     private static String pickWord(ArrayList<String> dictionary, HashMap<String, Integer> words) {
