@@ -20,6 +20,7 @@ public class TextDatasetGenerator {
         System.out.println("\tsrc/main/resources/text_dataset_settings/dataset_3");
         System.out.println("\tsrc/main/resources/text_dataset_settings/dataset_4");
         System.out.println("\tsrc/main/resources/text_dataset_settings/dataset_5");
+        System.out.println("\tsrc/main/resources/text_dataset_settings/dataset_6");
         String settingFilename = in.nextLine();
 
         Scanner datasetDefinition = new Scanner(new File(settingFilename));
