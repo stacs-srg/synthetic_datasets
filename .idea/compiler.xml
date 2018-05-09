@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="synthetic_datasets" target="1.5" />
+      <module name="synthetic_datasets" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>

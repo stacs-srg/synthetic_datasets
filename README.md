@@ -8,6 +8,7 @@
 
 ```
 mvn package -P text
+mvn package -P range-text
 mvn package -P random
 mvn package -P crawler
 ```

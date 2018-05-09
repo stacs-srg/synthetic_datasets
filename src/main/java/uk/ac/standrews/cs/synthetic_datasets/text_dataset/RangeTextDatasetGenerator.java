@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * @author Simone I. Conte "sic2@st-andrews.ac.uk"
  */
-public class TextDatasetGenerator {
+public class RangeTextDatasetGenerator {
 
     public static void main(String[] args) throws IOException {
 
@@ -15,13 +15,8 @@ public class TextDatasetGenerator {
 
         System.out.println("Enter dataset configuration pathname.");
         System.out.println("Examples of path: ");
-        System.out.println("\tsrc/main/resources/text_dataset_settings/dataset_1");
-        System.out.println("\tsrc/main/resources/text_dataset_settings/dataset_2");
-        System.out.println("\tsrc/main/resources/text_dataset_settings/dataset_3");
-        System.out.println("\tsrc/main/resources/text_dataset_settings/dataset_4");
-        System.out.println("\tsrc/main/resources/text_dataset_settings/dataset_5");
-        System.out.println("\tsrc/main/resources/text_dataset_settings/dataset_6");
-        System.out.println("\tsrc/main/resources/text_dataset_settings/dataset_7");
+        System.out.println("\tsrc/main/resources/range_text_dataset_settings/dataset_1");
+        System.out.println("\tsrc/main/resources/range_text_dataset_settings/dataset_2");
         String settingFilename = in.nextLine();
 
         Scanner datasetDefinition = new Scanner(new File(settingFilename));
@@ -30,6 +25,7 @@ public class TextDatasetGenerator {
         String[] fileSizeRange = datasetDefinition.next().split("-");
         int minFileSize = Integer.parseInt(fileSizeRange[0].trim());
         int maxFileSize = Integer.parseInt(fileSizeRange[1].trim());
+        int stepFileSize = datasetDefinition.nextInt();
 
         HashMap<String, Integer> wordsAndFrequency = new LinkedHashMap<>();
         while(datasetDefinition.hasNext()) {
@@ -41,26 +37,34 @@ public class TextDatasetGenerator {
             wordsAndFrequency.put(word, freq);
         }
 
-        createDataset(datasetPath, numberOfFiles, minFileSize, maxFileSize, wordsAndFrequency);
+        createDataset(datasetPath, numberOfFiles, minFileSize, maxFileSize, stepFileSize, wordsAndFrequency);
     }
 
-    private static void createDataset(String datasetPath, int numberOfFiles, int minFileSize, int maxFileSize, HashMap<String, Integer> words) throws IOException {
+    private static void createDataset(String datasetPath, int numberOfFiles, int minFileSize, int maxFileSize, int stepFileSize, HashMap<String, Integer> words) throws IOException {
 
-        File datasetFolder = new File(datasetPath);
-        if (datasetFolder.exists()) {
+        for(int i = minFileSize, index = 0; i <= maxFileSize; i+= stepFileSize, index++) {
+            createSubDataset(index, datasetPath + "/" + i, numberOfFiles, i, words);
+        }
+
+    }
+
+    private static void createSubDataset(int subsetIndex, String subDatasetPath, int numberOfFiles, int filesize, HashMap<String, Integer> words) throws IOException {
+
+        File subDatasetFolder = new File(subDatasetPath);
+        if (subDatasetFolder.exists()) {
             throw new IOException("Dataset exists already. Remove it manually if you want to recreate it");
         } else {
-            datasetFolder.mkdirs();
+            subDatasetFolder.mkdirs();
         }
 
         ArrayList<String> dictionary = loadDictionary();
         dictionary.removeAll(words.keySet()); // Make sure that the sets are not intersecting
         for(int i = 0; i < numberOfFiles; i++) {
-            createFile(i,datasetPath + "/file_" + i, minFileSize, maxFileSize, dictionary, words);
+            createFile(subsetIndex, i,subDatasetPath + "/file_" + i, filesize, filesize, dictionary, words);
         }
     }
 
-    private static void createFile(int index, String filepath, int minFileSize, int maxFileSize, ArrayList<String> dictionary, HashMap<String, Integer> words) throws FileNotFoundException, UnsupportedEncodingException {
+    private static void createFile(int subsetIndex, int index, String filepath, int minFileSize, int maxFileSize, ArrayList<String> dictionary, HashMap<String, Integer> words) throws FileNotFoundException, UnsupportedEncodingException {
 
         int numberOfWords = 0;
         int currentSize = 0;
@@ -88,7 +92,7 @@ public class TextDatasetGenerator {
             }
         }
 
-        System.out.println("[ " + index + " ] -- Created file: " + filepath + " || Size (bytes): " + currentSize + " || No. words: " + numberOfWords) ;
+        System.out.println("[ " + subsetIndex + " - " + index + " ] -- Created file: " + filepath + " || Size (bytes): " + currentSize + " || No. words: " + numberOfWords) ;
     }
 
     private static String pickWord(ArrayList<String> dictionary, HashMap<String, Integer> words) {
