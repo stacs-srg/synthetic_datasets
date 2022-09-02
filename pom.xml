@@ -18,7 +18,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
 
         <commons.io.version>2.7</commons.io.version>
-        <jsoup.version>1.11.2</jsoup.version>
+        <jsoup.version>1.15.3</jsoup.version>
 
         <!-- http://stackoverflow.com/questions/3017695/how-to-configure-encoding-in-maven -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
